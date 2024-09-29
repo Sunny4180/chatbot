@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumni Buddy Mapping System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Student Profile Upload Section</h2>
+        <div class="upload-section">
+            <input type="file" id="studentFile" accept=".csv, .xlsx">
+            <button onclick="uploadFile()">Upload</button>
+        </div>
+
+        <h3>Alumni Matching Algorithm</h3>
+        <p>Step 2: Match Alumni Based on Similar Backgrounds</p>
+        <button onclick="runMatching()">Run Matching Algorithm</button>
+
+        <h3>Download Report</h3>
+        <button onclick="downloadReport()">Download Report</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
