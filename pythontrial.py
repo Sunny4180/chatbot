@@ -1,8 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
+import streamlit as st
 from datetime import datetime
 import smtplib
-
-app = Flask(__name__)  # Corrected this line
 
 # Sample data for live sessions
 live_sessions = {
@@ -16,34 +14,41 @@ live_sessions = {
     }
 }
 
-@app.route('/')
-def home():
-    return render_template('announcement.html', live_sessions=live_sessions)
+# Function to send email
+def send_email(to_email, content):
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login("your_email@gmail.com", "your_password")  # Replace with your email and password
+        server.sendmail("your_email@gmail.com", to_email, content)
+        server.quit()
+    except Exception as e:
+        st.error(f"Error sending email: {str(e)}")
 
-@app.route('/join_session/<session_id>')
-def join_session(session_id):
-    session = live_sessions.get(session_id)
-    if session:
-        return redirect(session['link'])
-    return "Session not found", 404
+# Home Page
+st.title("Live Sessions")
+for session_id, session in live_sessions.items():
+    st.subheader(session['title'])
+    st.write(f"**Topic:** {session['topic']}")
+    st.write(f"**Date:** {session['date']} at {session['time']}")
+    st.write(f"**Speaker:** {session['speaker']}")
+    st.markdown(f"[Join Session]({session['link']})")
 
-@app.route('/set_reminder/<session_id>', methods=["POST"])
-def set_reminder(session_id):
-    email = request.form['email']
-    session = live_sessions.get(session_id)
-    if session:
-        # Simplified email sending logic
+# Email Reminder Section
+email = st.text_input("Enter your email for reminders:")
+if st.button("Set Reminder"):
+    if email:
+        # Email reminder text
         reminder_text = f"Reminder: {session['title']} by {session['speaker']} on {session['date']} at {session['time']}"
         send_email(email, reminder_text)
-        return "Reminder set successfully"
-    return "Session not found", 404
+        st.success("Reminder set successfully!")
+    else:
+        st.error("Please enter a valid email.")
 
-@app.route('/add_to_calendar/<session_id>')
-def add_to_calendar(session_id):
-    session = live_sessions.get(session_id)
-    if session:
-        # Add to calendar logic, generate ICS file for download
-        ics_content = f"""BEGIN:VCALENDAR
+# Add to Calendar Section
+if st.button("Add to Calendar"):
+    session = live_sessions["session_id"]  # Modify if using multiple sessions
+    ics_content = f"""BEGIN:VCALENDAR
 VERSION:2.0
 BEGIN:VEVENT
 SUMMARY:{session['title']}
@@ -52,22 +57,8 @@ DTSTART:{datetime.strptime(session['date'], '%Y-%m-%d').strftime('%Y%m%d')}T{ses
 LOCATION:Online
 END:VEVENT
 END:VCALENDAR"""
-        return ics_content, 200, {
-            'Content-Type': 'text/calendar',
-            'Content-Disposition': f'attachment; filename={session["title"]}.ics'
-        }
-    return "Session not found", 404
+    
+    st.download_button("Download Calendar Invite", data=ics_content, file_name=f"{session['title']}.ics", mime='text/calendar')
 
-def send_email(to_email, content):
-    # Simplified example, replace with your SMTP server credentials
-    try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login("your_email@gmail.com", "password")  # Use environment variables for sensitive info
-        server.sendmail("your_email@gmail.com", to_email, content)
-        server.quit()
-    except Exception as e:
-        print(f"Error: {str(e)}")
-
-if __name__ == '__main__':  # Corrected this line as well
-    app.run(debug=True)
+if __name__ == "__main__":
+    st.write("Streamlit app is running.")
