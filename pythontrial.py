@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import smtplib
 
-app = Flask(_name_)
+app = Flask(__name__)
 
 # Sample data for live sessions
 live_sessions = {
