@@ -1,9 +1,8 @@
-
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import smtplib
 
-app = Flask(__name__)
+app = Flask(__name__)  # Corrected this line
 
 # Sample data for live sessions
 live_sessions = {
@@ -64,11 +63,11 @@ def send_email(to_email, content):
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
-        server.login("your_email@gmail.com", "password")
+        server.login("your_email@gmail.com", "password")  # Use environment variables for sensitive info
         server.sendmail("your_email@gmail.com", to_email, content)
         server.quit()
     except Exception as e:
         print(f"Error: {str(e)}")
 
-if _name_ == '_main_':
+if __name__ == '__main__':  # Corrected this line as well
     app.run(debug=True)
