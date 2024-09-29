@@ -1,4 +1,4 @@
-Flask==2.3.2
+
 from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime
 import smtplib
